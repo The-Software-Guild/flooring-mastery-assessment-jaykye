@@ -1,6 +1,7 @@
 package dto;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class Order {
@@ -16,6 +17,8 @@ public class Order {
     private BigDecimal LaborCost;
     private BigDecimal Tax;
     private BigDecimal Total;
+    private String orderDate;
+
 
     public Order(int orderNumber) {
         this.orderNumber = orderNumber;
@@ -69,6 +72,10 @@ public class Order {
         return Total;
     }
 
+    public String getOrderDate() {
+        return orderDate;
+    }
+
     public void setCustomerName(String customerName) {
         CustomerName = customerName;
     }
@@ -111,6 +118,10 @@ public class Order {
 
     public void setTotal(BigDecimal total) {
         Total = total;
+    }
+
+    public void setOrderDate(String orderDate) {
+        this.orderDate = orderDate;
     }
 
     @Override

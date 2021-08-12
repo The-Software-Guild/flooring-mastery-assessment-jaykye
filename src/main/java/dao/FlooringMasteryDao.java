@@ -1,6 +1,8 @@
 package dao;
 
 import dto.Order;
+import dto.Product;
+import dto.Tax;
 
 import java.util.List;
 
@@ -8,10 +10,9 @@ public interface FlooringMasteryDao {
 
     /**
      * Adds an order object to the order HashMap.
-     * @param orderNumber
      * @param order
      */
-    Order addOrder(int orderNumber, Order order);
+    Order addOrder(Order order);
 
     /**
      * Edits an order object in the order HashMap.
@@ -36,5 +37,22 @@ public interface FlooringMasteryDao {
      */
     List<Order> getAllOrder();
 
+    void loadAllData() throws FlooringMasteryPersistenceException;
+
+    /**
+     * Saves all the order data and separate them into different files based on the order dates.
+     * @throws FlooringMasteryPersistenceException
+     */
+    void saveAllOrderData() throws FlooringMasteryPersistenceException;
+
+    /**
+     * This exports all the orders data to the Master file.
+     * @throws FlooringMasteryPersistenceException
+     */
+    void exportToMasterOrderData() throws FlooringMasteryPersistenceException;
+
+    Tax getTax(String state);
+
+    Product getProduct(String productType);
 
 }

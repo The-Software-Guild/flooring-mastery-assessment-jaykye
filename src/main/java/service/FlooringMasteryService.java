@@ -1,20 +1,22 @@
 package service;
 
+import dao.FlooringMasteryPersistenceException;
 import dto.Order;
+
+import java.util.List;
 
 public interface FlooringMasteryService {
 
     /**
      * Adds an order. The method will query the user for necessary data.
      */
-    public void addOrder();
-    public void editOrder();
-    public void removeOrder();
-    public void exportAllData();
+    public Order addOrder(Order order);
+    Order getOrder(int orderNumber);
+    List<Order> getAllOrders();
+    public Order editOrder(int orderNumber, int fieldNumber, String newValue);
+    public Order removeOrder(int orderNumber);
+    public void exportAllData() throws FlooringMasteryPersistenceException;
 
-    /**
-     * Updates all the calculated fields in an Order object.
-     * @param order: The Order object to update the calculation.
-     */
-    Order updateCalculatedFields(Order order);
+    void loadAllData() throws FlooringMasteryPersistenceException;
+    void saveAllOrderData() throws FlooringMasteryPersistenceException;
 }
