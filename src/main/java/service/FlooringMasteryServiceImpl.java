@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FlooringMasteryServiceImpl implements FlooringMasteryService {
     FlooringMasteryDao dao;
@@ -26,9 +27,22 @@ public class FlooringMasteryServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public Order addOrder(Order order) {
-        // view will take care of getting all the data.
+    public Order addOrder(Order order) throws
+            FlooringMasteryInvalidOrderException,
+            FlooringMasteryInvalidDateInputException{
+        // Area is checked with the actual value before the order object is passed.
+
+        validateOrder(order);
+        updateCalculatedFields(order);
+        validateFileDateString(order.getOrderDate());
+
         return dao.addOrder(order);
+    }
+
+    @Override
+    public List<Order> getOrdersForADate(String date) {
+        List<Order> allOrderList = getAllOrders();
+        return allOrderList.stream().filter(order -> order.getOrderDate().equals(date)).collect(Collectors.toList());
     }
 
     @Override
@@ -42,25 +56,17 @@ public class FlooringMasteryServiceImpl implements FlooringMasteryService {
     }
 
     @Override
-    public Order editOrder(int orderNumber, int fieldNumber, String newValue) {
-        Order order = dao.getOrder(orderNumber);
-
-        switch (fieldNumber) {
-            case 1:
-                order.setCustomerName(newValue);
-                break;
-            case 2:
-                order.setState(newValue);
-                break;
-            case 3:
-                order.setProductType(newValue);
-                break;
-            case 4:
-                order.setArea(new BigDecimal(newValue));
-                break;
+    public Order editOrder(int orderNumber, int fieldNumber, String newValue) throws
+            FlooringMasteryInvalidOrderException{
+        try {
+            Order order = dao.editOrder(orderNumber, fieldNumber, newValue);
+            // Validate the order info.
+            validateOrder(order);
+            updateCalculatedFields(order);
         }
-
-        updateCalculatedFields(order);
+        catch (NumberFormatException e) {
+            throw new FlooringMasteryInvalidOrderException("The number entered is not valid");
+        }
 
         return null;
     }
@@ -131,12 +137,53 @@ public class FlooringMasteryServiceImpl implements FlooringMasteryService {
     public void validateFileDateString(String dateString)
             throws FlooringMasteryInvalidDateInputException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMddyyy");
+        LocalDate orderDate;
         try {
-            LocalDate.parse(dateString, formatter);
+            orderDate = LocalDate.parse(dateString, formatter);
         }
         catch (DateTimeParseException e) {
             throw new FlooringMasteryInvalidDateInputException(
                     "Datetime format is wrong. Please use MMddyyyy format", e);
         }
+
+        if (orderDate.compareTo(LocalDate.now()) < 1) {
+            throw new FlooringMasteryInvalidDateInputException(
+                    "The order date must be in the future.");
+        }
+    }
+
+    /**
+     * This validates user input values. Area value is checked when set.
+     * @param order The order object to validate.
+     * @throws FlooringMasteryInvalidOrderException
+     */
+    public void validateOrder(Order order) throws FlooringMasteryInvalidOrderException {
+        if (order.getCustomerName() == null
+        || order.getCustomerName().trim().length() == 0) {
+            throw new FlooringMasteryInvalidOrderException("#### The Customer name in the order is not valid.");
+        }
+        else if (dao.getTax(order.getState()) == null) {
+            throw new FlooringMasteryInvalidOrderException("#### The State in the order is not valid.");
+        }
+        else if (dao.getProduct(order.getProductType()) == null) {
+            throw new FlooringMasteryInvalidOrderException("#### The Product type in the order is not valid.");
+        }
+        else if (order.getArea().compareTo(new BigDecimal("0")) == 0) {
+            throw new FlooringMasteryInvalidOrderException("#### The Area value cannot be zero.");
+        }
+    }
+
+    public int getNextOrderNumber() {
+        int maxNum = 1;
+        int currOrderNumber = 1;
+
+        List<Order> allOrderList = dao.getAllOrder();
+        for (Order order : allOrderList) {
+            currOrderNumber = order.getOrderNumber();
+            if (currOrderNumber > maxNum) {
+                maxNum = currOrderNumber;
+            }
+        }
+        return maxNum + 1;
     }
 }

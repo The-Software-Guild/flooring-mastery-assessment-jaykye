@@ -45,7 +45,7 @@ class FlooringMasteryServiceImplTest {
     }
 
     @Test
-    public void addAndGetOrderTest(){
+    public void addAndGetOrderTest() throws Exception{
         // Arrange
         int orderNumber1 = 1;
         Order newOrder = new Order(orderNumber1);

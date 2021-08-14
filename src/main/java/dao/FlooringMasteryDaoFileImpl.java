@@ -44,7 +44,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
 
     @Override
     public Order addOrder(Order order) {
-        return orderMap.put(order.getOrderNumber(), order);
+        return  orderMap.put(order.getOrderNumber(), order);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
         Order order = orderMap.get(orderNumber);
 
         // Remember that I cannot set the calculated fields, dependent fields and order date(Cannot be changed.)
-        if (order != null) {
+        if (order != null) {  // if I can find the file...
             switch (fieldNumber) {
                 case 1:
                     order.setCustomerName(newValue);
@@ -68,7 +68,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
                     break;
             }
         }
-        return order;
+        return order; // if the order is null, just return it. This will be handled in service layer with others.
     }
 
     @Override
@@ -288,6 +288,15 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
     public void saveAllOrderData() throws FlooringMasteryPersistenceException{
         // Dumps all data in orderMap into appropriate files.
 
+        // Hacky way of handling orderDates that got removed. -- file must be deleted.
+        File orderDir = new File(ORDERDIR);
+        File[] filelist = orderDir.listFiles();
+        for (File file : filelist) {
+            if (!file.isDirectory()) {
+                file.delete();
+            }
+        }
+
         PrintWriter out;
         String orderAsText;
         List<Order> orderList = getAllOrder();
@@ -375,7 +384,8 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
         orderAsText += anOrder.getMaterialCost() + DELIMITER;
         orderAsText += anOrder.getLaborCost() + DELIMITER;
         orderAsText += anOrder.getTax() + DELIMITER;
-        orderAsText += anOrder.getTotal();
+        orderAsText += anOrder.getTotal() + DELIMITER;
+        orderAsText += anOrder.getOrderDate();
 
         return orderAsText;
     }
@@ -398,7 +408,8 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
         orderFromFile.setMaterialCost(new BigDecimal(orderTokens[i++]));
         orderFromFile.setLaborCost(new BigDecimal(orderTokens[i++]));
         orderFromFile.setTax(new BigDecimal(orderTokens[i++]));
-        orderFromFile.setTotal(new BigDecimal(orderTokens[i]));
+        orderFromFile.setTotal(new BigDecimal(orderTokens[i++]));
+        orderFromFile.setOrderDate(orderTokens[i]);
 
         // Don't mind the calculated fields here.
         // Calculation will be done with a separate method in service layer.
