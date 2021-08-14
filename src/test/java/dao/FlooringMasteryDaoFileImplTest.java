@@ -3,6 +3,7 @@ import dto.Order;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
@@ -19,12 +20,17 @@ class FlooringMasteryDaoFileImplTest {
 
     @BeforeEach
     public void setUp() throws Exception{
+
         // Use the FileWriter to quickly blank the file
         String testFilePath = "./testdata/Orders/Orders_08102021.txt";
-        FileWriter writer = new FileWriter(testFilePath);
-        String testDataDir = "./testdata/";
-        testDao = new FlooringMasteryDaoFileImpl(testDataDir);
-        writer.close();
+//        FileWriter writer = new FileWriter(testFilePath);
+        PrintWriter out = new PrintWriter(new FileWriter(testFilePath));
+        testDao = new FlooringMasteryDaoFileImpl("./testdata/");
+
+        out.println(testDao.HEADER);
+        out.flush();
+        out.close();
+
     }
 
     @AfterEach

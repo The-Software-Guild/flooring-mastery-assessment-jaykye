@@ -20,7 +20,9 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
     Map<String, Tax> taxMap = new HashMap<>();
     Map<String, Product> productMap = new HashMap<>();
     String DELIMITER = "::";
-
+    String HEADER = "OrderNumber::CustomerName::State::TaxRate::ProductType" +
+            "::Area::CostPerSquareFoot::LaborCostPerSquareFoot" +
+            "::MaterialCost::LaborCost::Tax::Total::OrderDate";
 
     public FlooringMasteryDaoFileImpl() {
         BASEDATADIR = "data/";
@@ -141,6 +143,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
     public Product getProduct(String productType) {
         return productMap.get(productType);
     }
+
 
     private Product unmarshallProduct(String productEntryText) {
         String[] productTokens = productEntryText.split(DELIMITER);
@@ -319,10 +322,8 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
             }
 
             // Write header.
-            String header = "OrderNumber::CustomerName::State::TaxRate::ProductType" +
-                    "::Area::CostPerSquareFoot::LaborCostPerSquareFoot" +
-                    "::MaterialCost::LaborCost::Tax::Total::OrderDate";
-            out.println(header);
+
+            out.println(HEADER);
 
             // Write records.
             for (Order currentOrder : orderListPerDate) {
@@ -354,10 +355,7 @@ public class FlooringMasteryDaoFileImpl implements FlooringMasteryDao{
         }
 
         // Write header.
-        String header = "OrderNumber::CustomerName::State::TaxRate::ProductType" +
-                "::Area::CostPerSquareFoot::LaborCostPerSquareFoot" +
-                "::MaterialCost::LaborCost::Tax::Total::OrderDate";
-        out.println(header);
+        out.println(HEADER);
 
         for (Order order : orderList) {
             // Write records.

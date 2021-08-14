@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 
 class FlooringMasteryServiceImplTest {
-    FlooringMasteryDao testDao = new FlooringMasteryDaoFileImpl("testdata/");
+    FlooringMasteryDao testDao = new FlooringMasteryDaoFileImpl("./testdata/");
     FlooringMasteryServiceImpl testService = new FlooringMasteryServiceImpl(testDao);
 
 
@@ -46,13 +46,15 @@ class FlooringMasteryServiceImplTest {
 
     @Test
     public void addAndGetOrderTest() throws Exception{
+
         // Arrange
+        testService.loadAllData();
         int orderNumber1 = 1;
         Order newOrder = new Order(orderNumber1);
         newOrder.setCustomerName("Customer");
         newOrder.setState("TX");
         newOrder.setTaxRate(new BigDecimal("1.23"));
-        newOrder.setProductType("asdf");
+        newOrder.setProductType("Wood");
         newOrder.setArea(new BigDecimal("1.23"));
         newOrder.setCostPerSquareFoot(new BigDecimal("123"));
         newOrder.setLaborCostPerSquareFoot(new BigDecimal("123"));
@@ -60,8 +62,7 @@ class FlooringMasteryServiceImplTest {
         newOrder.setLaborCost(new BigDecimal("123"));
         newOrder.setTax(new BigDecimal("123"));
         newOrder.setTotal(new BigDecimal("1.23"));
-
-
+        newOrder.setOrderDate("09092022");
         testService.addOrder(newOrder);
 
         assertEquals(newOrder, testService.getOrder(orderNumber1));
@@ -69,14 +70,16 @@ class FlooringMasteryServiceImplTest {
 
     @Test
     public void editOrderTest() throws Exception{
-        testService.loadAllData();
         // Arrange
+        testService.loadAllData();
         int orderNumber1 = 1;
         Order newOrder = new Order(orderNumber1);
         newOrder.setCustomerName("Customer");
         newOrder.setState("TX");
         newOrder.setProductType("Wood");
         newOrder.setArea(new BigDecimal("1.00"));
+        newOrder.setOrderDate("09092022");
+
         testService.addOrder(newOrder);
 
         int nameField = 1;
@@ -94,12 +97,15 @@ class FlooringMasteryServiceImplTest {
     @Test
     public void removeAndGetALLOrderTest() throws Exception{
         // Arrange
+        testService.loadAllData();
         int orderNumber1 = 1;
         Order newOrder = new Order(orderNumber1);
         newOrder.setCustomerName("Customer");
         newOrder.setState("TX");
         newOrder.setProductType("Wood");
         newOrder.setArea(new BigDecimal("1.00"));
+        newOrder.setOrderDate("09092022");
+
         testService.addOrder(newOrder);
 
         // Act

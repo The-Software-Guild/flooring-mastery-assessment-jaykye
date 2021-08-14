@@ -171,6 +171,9 @@ public class FlooringMasteryServiceImpl implements FlooringMasteryService {
         else if (order.getArea().compareTo(new BigDecimal("0")) == 0) {
             throw new FlooringMasteryInvalidOrderException("#### The Area value cannot be zero.");
         }
+        else if (order.getOrderDate() == null || order.getOrderDate() == "") {
+            throw new FlooringMasteryInvalidOrderException("#### Enter order date.");
+        }
     }
 
     public int getNextOrderNumber() {
